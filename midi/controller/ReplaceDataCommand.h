@@ -50,6 +50,7 @@ public:
         std::shared_ptr<const MidiNoteEvent>,
         bool extendSelection);
     static ReplaceDataCommandPtr makeChangePitchCommand(std::shared_ptr<MidiSequencer> seq, int semitones);
+    static ReplaceDataCommandPtr makeChangeVelocityCommand(std::shared_ptr<MidiSequencer> seq, float delta);
     static ReplaceDataCommandPtr makeChangeStartTimeCommand(std::shared_ptr<MidiSequencer> seq, float delta, float quantizeGrid);
     static ReplaceDataCommandPtr makeChangeStartTimeCommand(std::shared_ptr<MidiSequencer> seq, const std::vector<float>&);
     
@@ -124,7 +125,7 @@ private:
         std::vector<MidiEventPtr>& toDelete);
 
     // base for change pitch, start time, duration
-    enum class Ops {Pitch, Start, Duration };
+    enum class Ops {Pitch, Start, Duration, Velocity };
     using Xform = std::function<void(MidiEventPtr event, int index)>;
     static ReplaceDataCommandPtr makeChangeNoteCommand(
         Ops,

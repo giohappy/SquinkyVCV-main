@@ -90,11 +90,13 @@ MidiTrackPtr MidiFileProxy::getFirst(MidiSongPtr song, smf::MidiFile& midiFile) 
                 const double dur = double(evt.getTickDuration()) / ppq;
                 const double start = double(evt.tick) / ppq;
                 const float pitch = PitchUtils::midiToCV(evt.getKeyNumber());
+                const float velocity = evt.getVelocity();
 
                 MidiNoteEventPtr note = std::make_shared<MidiNoteEvent>();
                 note->startTime = float(start);
                 note->duration = float(dur);
                 note->pitchCV = float(pitch);
+                note->velocity = rack::math::rescale(velocity,0.0f,127.0f,0.0f,10.0f);
 
                 newTrack->insertEvent(note);
                 foundNotes = true;

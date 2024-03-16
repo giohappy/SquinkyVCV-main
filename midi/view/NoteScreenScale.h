@@ -62,6 +62,10 @@ public:
      */
     float yToMidiDeltaCVPitch(float) const;
 
+    /** convert y axis range to change in velocity
+     */
+    float yToMidiDeltaCVVelocity(float) const;
+
     bool isPointInBounds(float x, float y) const;
 private:
     /** These are the linear equation coefficients

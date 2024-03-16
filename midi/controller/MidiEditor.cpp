@@ -86,6 +86,12 @@ void MidiEditor::changePitch(int semitones) {
     seq()->context->assertCursorInViewport();
 }
 
+void MidiEditor::changeVelocity(float delta) {
+    ReplaceDataCommandPtr cmd = ReplaceDataCommand::makeChangeVelocityCommand(seq(), delta);
+    seq()->undo->execute(seq(), cmd);
+    seq()->assertValid();
+}
+
 void MidiEditor::changeStartTime(bool ticks, int amount) {
     MidiLocker l(seq()->song->lock);
     AuditionLocker u(seq()->selection);  // don't audition while shifting

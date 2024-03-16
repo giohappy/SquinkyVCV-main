@@ -97,6 +97,23 @@ private:
     const float pitch0;                     // pitch when the drag started
 };
 
+/**
+ * Concrete implentation for dragging notes vlocity up and down
+ */
+class NoteVelocityDragger : public NoteDragger
+{
+public:
+    NoteVelocityDragger(MidiSequencerPtr, float x, float y);
+    void onDrag(float deltaX, float deltaY) override;
+
+private:
+    void commit() override;
+    void draw(NVGcontext *vg) override;
+
+    float delta = 0.f;
+    float lastDelta = 0.f;
+};
+
 
 /**
  * Base class for draggers the drag left and right.

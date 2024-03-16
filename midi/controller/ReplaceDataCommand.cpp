@@ -277,6 +277,23 @@ ReplaceDataCommandPtr ReplaceDataCommand::makeChangePitchCommand(MidiSequencerPt
     return ret;
 }
 
+ReplaceDataCommandPtr ReplaceDataCommand::makeChangeVelocityCommand(MidiSequencerPtr seq, float delta)
+{
+    seq->assertValid();
+    Xform xform = [delta](MidiEventPtr event, int) {
+        MidiNoteEventPtr note = safe_cast<MidiNoteEvent>(event);
+        if (note) {
+            float newVelocity = note->velocity + delta;
+            newVelocity = std::min(10.f, newVelocity);
+            newVelocity = std::max(0.f, newVelocity);
+            note->velocity = newVelocity;
+        }
+    };
+    auto ret = makeChangeNoteCommand(Ops::Velocity, seq, xform, false);
+    ret->name = "change velocity";
+    return ret;
+}
+
 ReplaceDataCommandPtr ReplaceDataCommand::makeChangeStartTimeCommand(MidiSequencerPtr seq, float delta, float quantizeGrid)
 {
     seq->assertValid();

@@ -120,13 +120,20 @@ bool MouseManager::onDragStart()
 
     const float relativeTime = (cursorTime - start) / (end - start);
 
-    if (relativeTime <= .33f) {
-        noteDragger = std::make_shared<NoteStartDragger>(sequencer, lastMouseClickPosX, lastMouseClickPosY, start);     
-    } else if (relativeTime <= .66f) {
-        noteDragger = std::make_shared<NotePitchDragger>(sequencer, lastMouseClickPosX, lastMouseClickPosY); 
-    } else {
-        const float noteDuration = note->duration;
-        noteDragger = std::make_shared<NoteDurationDragger>(sequencer, lastMouseClickPosX, lastMouseClickPosY, noteDuration); 
+    int mods = APP->window->getMods();
+
+    if ((mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+        noteDragger = std::make_shared<NoteVelocityDragger>(sequencer, lastMouseClickPosX, lastMouseClickPosY);
+    }
+    else {
+        if (relativeTime <= .33f) {
+            noteDragger = std::make_shared<NoteStartDragger>(sequencer, lastMouseClickPosX, lastMouseClickPosY, start);     
+        } else if (relativeTime <= .66f) {
+            noteDragger = std::make_shared<NotePitchDragger>(sequencer, lastMouseClickPosX, lastMouseClickPosY); 
+        } else {
+            const float noteDuration = note->duration;
+            noteDragger = std::make_shared<NoteDurationDragger>(sequencer, lastMouseClickPosX, lastMouseClickPosY, noteDuration); 
+        }
     }
     return true;
 }

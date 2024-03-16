@@ -51,6 +51,7 @@ public:
     /*********** functions that edit/change the notes **************/
 
     void changePitch(int semitones);
+    void changeVelocity(float delta);
     void changeStartTime(bool ticks, int amount);
     void changeStartTime(const std::vector<float>& shifts);
     void changeDuration(bool ticks, int amount);

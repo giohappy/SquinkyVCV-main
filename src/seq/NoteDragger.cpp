@@ -55,9 +55,12 @@ void NoteDragger::drawNotes(NVGcontext *vg, float verticalShift, float horizonta
             const float y = scaler->midiPitchToY(*note) + verticalShift;
             const float width = scaler->midiTimeTodX(note->duration) + finalHStretch;
 
+            NVGcolor selectiom_color = UIPrefs::SELECTED_NOTE_COLOR;
+            selectiom_color.a = rack::math::rescale(note->velocity, 0.0f, 10.0f, 0.0f, 1.0f);
+
             SqGfx::filledRect(
                 vg,
-                UIPrefs::SELECTED_NOTE_COLOR,
+                selectiom_color,
                 x, y, width, noteHeight);
         }
     }
@@ -162,6 +165,41 @@ void NotePitchDragger::draw(NVGcontext *vg)
     float verticalShift = curMousePositionY - startY;
     drawNotes(vg, verticalShift, 0, 0);
     SqGfx::drawText(vg, curMousePositionX + 20, curMousePositionY + 20, "transpose");
+}
+
+/******************************************************************
+*
+* NoteVelocityDragger
+*/
+
+// Remember current viewport pitch range. Shave some off top and
+// bottom to allow reasonable dragging.
+NoteVelocityDragger::NoteVelocityDragger(MidiSequencerPtr seq, float x, float y) :
+NoteDragger(seq, x, y)
+{
+}
+
+void NoteVelocityDragger::onDrag(float deltaX, float deltaY)
+{
+    NoteDragger::onDrag(deltaX, deltaY);
+    auto scaler = sequencer->context->getScaler();
+    const float verticalShift = -(curMousePositionY - startY);
+    delta = scaler->yToMidiDeltaCVVelocity(verticalShift);
+    sequencer->editor->changeVelocity(delta - lastDelta);
+    lastDelta = delta;
+}
+
+void NoteVelocityDragger::commit()
+{
+    lastDelta = 0.f;
+}
+
+void NoteVelocityDragger::draw(NVGcontext *vg)
+{
+    drawNotes(vg, 0, 0, 0);
+    char deltaChar[10];
+    sprintf(deltaChar, "%f", delta);
+    SqGfx::drawText(vg, curMousePositionX + 20, curMousePositionY + 20, deltaChar);
 }
 
 /******************************************************************

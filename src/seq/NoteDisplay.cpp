@@ -106,12 +106,16 @@ void NoteDisplay::drawNotes(NVGcontext *vg) {
 
         const float x = scaler->midiTimeToX(*ev);
         const float y = scaler->midiPitchToY(*ev);
+        const float velocity = ev->velocity;
+        
+        NVGcolor color = UIPrefs::NOTE_COLOR;
+        color.a = rack::math::rescale(velocity, 0.0f, 10.0f, 0.0f, 1.0f);
         const float width = scaler->midiTimeTodX(ev->duration);
         const bool selected = sequencer->selection->isSelected(ev);
         if (!selected || !mouseManager->willDrawSelection()) {
             SqGfx::filledRect(
                 vg,
-                selected ? UIPrefs::SELECTED_NOTE_COLOR : UIPrefs::NOTE_COLOR,
+                selected ? UIPrefs::SELECTED_NOTE_COLOR : color,
                 x, y, width, noteHeight);
         }
     }

@@ -146,6 +146,7 @@ public:
         type = Type::Note;
         this->pitchCV = n.pitchCV;
         this->duration = n.duration;
+        this->velocity = n.velocity;
     }
 
     MidiNoteEvent& operator=(const MidiNoteEvent& n)
@@ -153,6 +154,7 @@ public:
         assert (type == Type::Note);
         this->pitchCV = n.pitchCV;
         this->duration = n.duration;
+        this->velocity = n.velocity;
         this->startTime = n.startTime;
         return *this;
     }
@@ -162,10 +164,13 @@ public:
      */
     float pitchCV = 0;
     float duration = 1;
+    float velocity = 10;
     void assertValid() const override;
 
     void setPitch(int octave, int semi);
     std::pair<int, int> getPitch() const;
+    void setVelocity(float velocity);
+    float getVelocity() const;
     float endTime() const;
 
     virtual MidiEventPtr clone() const override;
@@ -184,6 +189,16 @@ inline std::pair<int, int> MidiNoteEvent::getPitch() const
 inline void MidiNoteEvent::setPitch(int octave, int semi)
 {
     pitchCV = PitchUtils::pitchToCV(octave, semi);
+}
+
+inline void MidiNoteEvent::setVelocity(float velocity)
+{
+    velocity = rack::math::clamp(velocity, 0.0f, 10.0f);
+}
+
+inline float MidiNoteEvent::getVelocity() const
+{
+    return velocity;
 }
 
 inline float MidiNoteEvent::endTime() const

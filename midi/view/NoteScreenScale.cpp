@@ -107,6 +107,14 @@ float NoteScreenScale::yToMidiDeltaCVPitch(float dy) const
     return dy * ay_rev;
 }
 
+float NoteScreenScale::yToMidiDeltaCVVelocity(float dy) const
+{
+    auto ctx = context();
+    float activeScreenHeight = screenHeight - topMargin;
+    float vely_rev = 10.f / 100.f;
+    return dy * vely_rev;
+}
+
 
 float NoteScreenScale::midiCvToY(float cv) const
 {
