@@ -48,7 +48,8 @@ SequencerModule::SequencerModule()
     configInput(Comp::GATE_INPUT,"Gate"); 
     configOutput(Seq<WidgetComposite>::CV_OUTPUT,"CV");
     configOutput(Seq<WidgetComposite>::GATE_OUTPUT,"Gate");
-    configOutput(Seq<WidgetComposite>::EOC_OUTPUT,"EOC");
+    configOutput(Seq<WidgetComposite>::VEL_OUTPUT,"Vel");
+    //configOutput(Seq<WidgetComposite>::EOC_OUTPUT,"EOC");
 
     std::shared_ptr<IComposite> icomp = Comp::getDescription();
     SqHelper::setupParams(icomp, this);
@@ -569,12 +570,23 @@ void SequencerWidget::addJacks(SequencerModule *module)
     addOutput(createOutputCentered<PJ301MPort>(
         Vec(jacksX + 2 * jacksDx, jacksY2),
         module,
+        Seq<WidgetComposite>::VEL_OUTPUT));
+#ifdef _LAB
+    addLabel(
+        Vec(labelX + 2 * jacksDx, jacksY2 + dy),
+        "Vel");
+#endif   
+/*
+    addOutput(createOutputCentered<PJ301MPort>(
+        Vec(jacksX + 2 * jacksDx, jacksY2),
+        module,
         Seq<WidgetComposite>::EOC_OUTPUT));
 #ifdef _LAB
     addLabel(
         Vec(labelX + 2 * jacksDx, jacksY2 + dy),
         "EOC");
-#endif        
+#endif
+*/
 }
 
 void SequencerModule::dataFromJson(json_t *data)

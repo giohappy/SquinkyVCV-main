@@ -38,7 +38,7 @@ public:
      * be played.
      * @param endTime is the start time + duration for the note.
      */
-    void playNote(float pitch, double currentTime, float endTime);
+    void playNote(float pitch, float velocity, double currentTime, float endTime);
 
     /**
      * Advance clock, sending any data that needs to be sent.
@@ -57,6 +57,7 @@ public:
 
     State state() const;
     float pitch() const;
+    float velocity() const;
 
     // these are only for debugging
     int _getIndex() const;
@@ -96,4 +97,5 @@ private:
 
     void setGate(bool);
     void setCV(float);
+    void setVel(float);
 };

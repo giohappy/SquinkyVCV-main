@@ -36,6 +36,11 @@ void MidiVoice::setCV(float cv)
     host->setCV(track, index, cv);
 }
 
+void MidiVoice::setVel(float velocity)
+{
+    host->setVel(track, index, velocity);
+}
+
 float MidiVoice::pitch() const
 {
     return curPitch;
@@ -68,7 +73,7 @@ void MidiVoice::updateSampleCount(int samples)
     } 
 }
 
-void MidiVoice::playNote(float pitch, double currentTime, float endTime)
+void MidiVoice::playNote(float pitch, float velocity, double currentTime, float endTime)
 {
 #ifdef _MLOG
     printf("\nMidiVoice[%d]::playNote curt=%f, end time = %f, lastnot=%f\n", index, currentTime, endTime, lastNoteOffTime);
@@ -98,6 +103,7 @@ void MidiVoice::playNote(float pitch, double currentTime, float endTime)
 
         this->curState = State::Playing;
         setCV(pitch);
+        setVel(velocity);
         setGate(true);
     }
 }

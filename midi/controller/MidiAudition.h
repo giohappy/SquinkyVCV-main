@@ -26,11 +26,11 @@ public:
     /**
      * This method called from the UI thread. 
      */
-    void auditionNote(float pitch) override {
+    void auditionNote(float pitch, float velocity) override {
         // if queue if full, drop note on the floor. If there's room, queue it
         // up to play from audio thread
         if (!noteQueue.full()) {
-            noteQueue.push(pitch);
+            noteQueue.push(std::pair<float, float> {pitch, velocity});
         }
     }
 
@@ -115,16 +115,16 @@ private:
     bool isPlaying = false;
     float pitchToPlayAfterRetrigger = 0;
     bool enabled = false;
-    AtomicRingBuffer<float, 4> noteQueue;
+    AtomicRingBuffer<std::pair<float, float>, 4> noteQueue;
 
     void serviceNoteQueue() {
         while (!noteQueue.empty()) {
-            float pitch = noteQueue.pop();
-            replayAuditionNoteOnAudioThread(pitch);
+            std::pair<float, float> pitchVel = noteQueue.pop();
+            replayAuditionNoteOnAudioThread(pitchVel);
         }
     }
 
-    void replayAuditionNoteOnAudioThread(float pitch) {
+    void replayAuditionNoteOnAudioThread(std::pair<float, float> pitchVel) {
 #ifdef _AUDITION  // disable in real seq until done
 #ifdef _LOG
         printf("audition note pitch %.2f retig=%d, playing=%d\n", pitch, isRetriggering, isPlaying);
@@ -138,14 +138,15 @@ private:
 #ifdef _LOG
             printf("audition note playing normal at pitch %.2f\n", pitch);
 #endif
-            playerHost->setCV(0, 0, pitch);
+            playerHost->setCV(0, 0, pitchVel.first);
+            playerHost->setVel(0, 0, pitchVel.second);
             playerHost->setGate(0, 0, true);
             timerSeconds = noteDurationSeconds();
             isPlaying = true;
         } else {
             // play when already playing
             // we will re-trigger, or at least change pitch
-            pitchToPlayAfterRetrigger = pitch;
+            pitchToPlayAfterRetrigger = pitchVel.first;
             if (!isRetriggering) {
                 isRetriggering = true;
                 isPlaying = false;

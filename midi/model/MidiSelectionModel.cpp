@@ -117,7 +117,7 @@ void MidiSelectionModel::add(MidiEventPtr evt)
 
     MidiNoteEventPtr note = safe_cast<MidiNoteEvent>(evt);
     if (note && !auditionSuppressed) {
-        auditionHost->auditionNote(note->pitchCV);
+        auditionHost->auditionNote(note->pitchCV, note->velocity);
     }
     selection.insert(evt);
 }
@@ -155,7 +155,7 @@ MidiEventPtr MidiSelectionModel::getLast()
 class NullAudition : public IMidiPlayerAuditionHost
 {
 public:
-    void auditionNote(float pitch) override
+    void auditionNote(float pitch, float velocity) override
     {
 
     }

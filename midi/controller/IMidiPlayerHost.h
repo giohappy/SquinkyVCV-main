@@ -12,6 +12,7 @@ public:
     virtual void setEOC(int track, bool eoc) = 0;
     virtual void setGate(int track, int voice, bool gate) = 0;
     virtual void setCV(int track, int voice, float pitch) = 0;
+    virtual void setVel(int track, int voice, float velocity) = 0;
     virtual void onLockFailed() = 0;
 
     /**
@@ -31,7 +32,7 @@ using IMidiPlayerHost4Ptr = std::shared_ptr<IMidiPlayerHost4>;
  */
 class IMidiPlayerAuditionHost {
 public:
-    virtual void auditionNote(float pitch) = 0;
+    virtual void auditionNote(float pitch, float velocity) = 0;
     virtual ~IMidiPlayerAuditionHost() = default;
 };
 

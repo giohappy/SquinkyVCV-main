@@ -180,6 +180,7 @@ json_t *SequencerSerializer::toJson(std::shared_ptr<MidiNoteEvent> n)
     json_object_set_new(note, "t", json_integer(typeNote));
     json_object_set_new(note, "s", json_real(n->startTime));
     json_object_set_new(note, "p", json_real(n->pitchCV));
+    json_object_set_new(note, "v", json_real(n->velocity));
     json_object_set_new(note, "d", json_real(n->duration));
     return note;
 }
@@ -463,10 +464,12 @@ MidiTrack4OptionsPtr SequencerSerializer::fromJsonOptions(json_t* data )
 MidiNoteEventPtr SequencerSerializer::fromJsonNoteEvent(json_t *data)
 {
     json_t* pitchJson = json_object_get(data, "p");
+    json_t* velocityJson = json_object_get(data, "v");
     json_t* durationJson = json_object_get(data, "d");
     json_t* startJson = json_object_get(data, "s");
     MidiNoteEventPtr note = std::make_shared<MidiNoteEvent>();
     note->pitchCV = json_number_value(pitchJson);
+    note->velocity = json_number_value(velocityJson);
     note->duration = json_number_value(durationJson);
     note->startTime = json_number_value(startJson);
     return note;

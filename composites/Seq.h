@@ -78,6 +78,7 @@ public:
     enum OutputIds {
         CV_OUTPUT,
         GATE_OUTPUT,
+        VEL_OUTPUT,
         EOC_OUTPUT,
         NUM_OUTPUTS
     };
@@ -192,6 +193,18 @@ public:
 #endif
         seq->outputs[Seq<TBase>::CV_OUTPUT].setVoltage(cv,voice);
     }
+    void setVel(int track, int voice, float velocity) override {
+        assert(track == 0);
+#if defined(_MLOG)
+        printf("*** host::setCV(%d) = (%d, %.2f) t=%f\n",
+               voice,
+               seq->outputs[Seq<TBase>::GATE_OUTPUT].getVoltage(voice]) > 5,
+               cv,
+               seq->getPlayPosition());
+        fflush(stdout);
+#endif
+        seq->outputs[Seq<TBase>::VEL_OUTPUT].setVoltage(velocity,voice);
+    }
     void onLockFailed() override {
     }
 
@@ -291,6 +304,7 @@ void Seq<TBase>::stepn(int n) {
     // copy the current voice number to the poly ports
     const int numVoices = (int)std::round(TBase::params[NUM_VOICES_PARAM].value + 1);
     TBase::outputs[CV_OUTPUT].setChannels(numVoices);
+    TBase::outputs[VEL_OUTPUT].setChannels(numVoices);
     TBase::outputs[GATE_OUTPUT].setChannels(numVoices);
 
     player->setNumVoices(0, numVoices);

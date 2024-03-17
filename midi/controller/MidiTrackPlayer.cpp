@@ -359,7 +359,7 @@ bool MidiTrackPlayer::playOnce(double metricTime, float quantizeInterval) {
                 // play the note
                 const double durationQuantized = TimeUtils::quantize(note->duration, quantizeInterval, false);
                 double quantizedNoteEnd = TimeUtils::quantize(durationQuantized + eventStart, quantizeInterval, false);
-                voice->playNote(note->pitchCV, float(eventStart), float(quantizedNoteEnd));
+                voice->playNote(note->pitchCV, note->velocity, float(eventStart), float(quantizedNoteEnd));
                 ++playback.curEvent;
                 // printfprintf("just inc curEvent 129\n");
             } break;

@@ -191,7 +191,6 @@ void NoteVelocityDragger::onDrag(float deltaX, float deltaY)
 
 void NoteVelocityDragger::commit()
 {
-    lastDelta = 0.f;
 }
 
 void NoteVelocityDragger::draw(NVGcontext *vg)

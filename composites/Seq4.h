@@ -232,6 +232,8 @@ public:
 #endif
         seq->outputs[Seq4<TBase>::CV0_OUTPUT + track].voltages[voice] = cv;
     }
+
+    void setVel(int track, int voice, float cv) override {}
     void onLockFailed() override {
     }
     void resetClock() override {
