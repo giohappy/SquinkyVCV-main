@@ -281,7 +281,7 @@ SequencerWidget::SequencerWidget(SequencerModule *module) : _module(module)
     }
     // was 14, before 8
     // 8 for panel, 28 for notes
-    const int panelWidthHP = 8;
+    const int panelWidthHP = 11;
     const int width = (panelWidthHP + 28) * RACK_GRID_WIDTH; 
     box.size = Vec(width, RACK_GRID_HEIGHT);
     std::shared_ptr<IComposite> icomp = Comp::getDescription();
@@ -396,7 +396,7 @@ void SequencerWidget::addControls(SequencerModule *module, std::shared_ptr<IComp
         Vec(controlX, y),
         module,
         Comp::CLOCK_INPUT_PARAM);
-    p->box.size.x = 85 + 8;    // width
+    p->box.size.x = 130 + 8;    // width
     p->box.size.y = 22;         // should set auto like button does
     p->text = "x64";
     p->setLabels(Comp::getClockRates());
@@ -487,7 +487,7 @@ void SequencerWidget::addControls(SequencerModule *module, std::shared_ptr<IComp
 
 void SequencerWidget::addStepRecord(SequencerModule *module)
 {
-    const float jacksDx = 40;
+    const float jacksDx = 41;
     const float jacksX = 20;
     const float jacksY = 230;
     addInput(createInputCentered<PJ301MPort>(
@@ -576,9 +576,9 @@ void SequencerWidget::addJacks(SequencerModule *module)
         Vec(labelX + 2 * jacksDx, jacksY2 + dy),
         "Vel");
 #endif   
-/*
+
     addOutput(createOutputCentered<PJ301MPort>(
-        Vec(jacksX + 2 * jacksDx, jacksY2),
+        Vec(jacksX + 3 * jacksDx, jacksY2),
         module,
         Seq<WidgetComposite>::EOC_OUTPUT));
 #ifdef _LAB
@@ -586,7 +586,6 @@ void SequencerWidget::addJacks(SequencerModule *module)
         Vec(labelX + 2 * jacksDx, jacksY2 + dy),
         "EOC");
 #endif
-*/
 }
 
 void SequencerModule::dataFromJson(json_t *data)
