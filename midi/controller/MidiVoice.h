@@ -75,6 +75,7 @@ private:
      * we hand not needed to re-trigger.
      */
     float delayedNotePitch;
+    float delayedNoteVelocity;
     double delayedNoteEndtime;
 
     /**

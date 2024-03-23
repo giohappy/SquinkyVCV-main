@@ -67,6 +67,7 @@ void MidiVoice::updateSampleCount(int samples)
             retriggerSampleCounter = 0;
             curState = State::Playing;
             setCV(delayedNotePitch);
+            setVel(delayedNoteVelocity);
             noteOffTime = delayedNoteEndtime;
             setGate(true);
         }
@@ -89,6 +90,7 @@ void MidiVoice::playNote(float pitch, float velocity, double currentTime, float 
        // printf("gate low in normal gate off logic\n");
         setGate(false);
         delayedNotePitch = pitch;
+        delayedNoteVelocity = velocity;
         delayedNoteEndtime = endTime;
         retriggerSampleCounter = numSamplesInRetrigger;
 #ifdef _MLOG
