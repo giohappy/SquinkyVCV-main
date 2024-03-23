@@ -22,6 +22,9 @@ public:
     MidiSequencerPtr sequencer;
     SequencerWidget* widget = nullptr;
 
+    rack::dsp::SchmittTrigger reloadTrigger;
+    std::atomic<bool> midFileReloadRequested;
+
     void setModuleId(bool fromWidget) {
         sequencer->undo->setModuleId(this->id, fromWidget);
     }
@@ -36,6 +39,8 @@ public:
         seqComp->step();
     }
     void onReset() override;
+
+    void process(const ProcessArgs &args) override;
 
     float getPlayPosition()
     {

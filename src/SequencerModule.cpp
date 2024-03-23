@@ -44,6 +44,7 @@ SequencerModule::SequencerModule()
     configInput(Comp::CLOCK_INPUT,"Clock");
     configInput(Comp::RUN_INPUT,"Run");
     configInput(Comp::RESET_INPUT,"Reset");
+    configInput(Comp::RELOAD_INPUT,"Reload"); 
     configInput(Comp::CV_INPUT,"CV");  
     configInput(Comp::GATE_INPUT,"Gate"); 
     configOutput(Seq<WidgetComposite>::CV_OUTPUT,"CV");
@@ -54,12 +55,20 @@ SequencerModule::SequencerModule()
     std::shared_ptr<IComposite> icomp = Comp::getDescription();
     SqHelper::setupParams(icomp, this);
     runStopRequested = false;
+    midFileReloadRequested = false;
     MidiSongPtr song = MidiSong::makeTest(MidiTrack::TestContent::empty, 0);
     ISeqSettings* ss = new SeqSettings(this);
     std::shared_ptr<ISeqSettings> _settings( ss);
     seqComp = std::make_shared<Comp>(this, song);
     sequencer = MidiSequencer::make(song, _settings, seqComp->getAuditionHost());
 }
+
+void SequencerModule::process(const ProcessArgs &args) {
+    if (reloadTrigger.process(inputs[Comp::RELOAD_INPUT].getVoltage())) {
+        midFileReloadRequested = true;
+    }
+    step();
+};
 
 static const char* helpUrl = "https://github.com/kockie69/SquinkyVCV-main/blob/master/docs/sq2.md";
 
@@ -106,6 +115,7 @@ struct SequencerWidget : ModuleWidget
     }
 
     void loadMidiFile();
+    void reloadMidiFile();
     void saveMidiFile();
 
     /**
@@ -206,13 +216,14 @@ void SequencerWidget::loadMidiFile()
     osdialog_filters* filters = osdialog_filters_parse(SMF_FILTERS);
     std::string filename;
 
-    std::string dir = _module->sequencer->context->settings()->getMidiFilePath();
+    std::string filePath = _module->sequencer->context->settings()->getMidiFilePath();
+    std::string fileFolder = rack::system::getDirectory(filePath);
 
 	DEFER({
 		osdialog_filters_free(filters);
 	});
 
-	char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), filename.c_str(), filters);
+	char* pathC = osdialog_file(OSDIALOG_OPEN, fileFolder.c_str(), filename.c_str(), filters);
   
 	if (!pathC) {
 		// Fail silently
@@ -224,13 +235,24 @@ void SequencerWidget::loadMidiFile()
 
     MidiSongPtr song = MidiFileProxy::load(pathC);
 
-    std::string temp(pathC);
-    std::string fileFolder = rack::system::getDirectory(temp);
     if (song) {
         // Seq++ doesn't make undo events for external modules.
-        _module->postNewSong(song, fileFolder, false);
+        _module->postNewSong(song, pathC, false);
     }  
 }
+
+void SequencerWidget::reloadMidiFile()
+{
+    std::string filePath = _module->sequencer->context->settings()->getMidiFilePath();
+    std::string fileFolder = rack::system::getDirectory(filePath);
+
+    if (rack::system::exists(filePath)) {
+        MidiSongPtr song = MidiFileProxy::load(filePath);
+        if (song) {
+            _module->postNewSong(song, filePath, false);
+        } 
+    }
+};
 
 void SequencerWidget::step()
  {
@@ -252,9 +274,17 @@ void SequencerWidget::step()
         }
     }
 
+    if (_module) {
+
+    }
+
     // give this guy a chance to do some processing on the UI thread.
     if (_module) {
         _module->setModuleId(true);
+        if (_module->midFileReloadRequested) {
+            reloadMidiFile();
+            _module->midFileReloadRequested = false;
+        }
 #ifdef _USERKB
         noteDisplay->onUIThread(_module->seqComp, _module->sequencer);
 #else
@@ -413,7 +443,7 @@ void SequencerWidget::addControls(SequencerModule *module, std::shared_ptr<IComp
         Vec(controlX, y),
         module,
         Comp::NUM_VOICES_PARAM);
-    p->box.size.x = 85 + 8;     // width
+    p->box.size.x = 130 + 8;     // width
     p->box.size.y = 22;         // should set auto like button does
     p->text = "1";
     p->setLabels(Comp::getPolyLabels());
@@ -487,7 +517,7 @@ void SequencerWidget::addControls(SequencerModule *module, std::shared_ptr<IComp
 
 void SequencerWidget::addStepRecord(SequencerModule *module)
 {
-    const float jacksDx = 41;
+    const float jacksDx = 40;
     const float jacksX = 20;
     const float jacksY = 230;
     addInput(createInputCentered<PJ301MPort>(
@@ -510,7 +540,7 @@ void SequencerWidget::addJacks(SequencerModule *module)
 {
     const float jacksY1 = 286-2;
     const float jacksY2 = 330+2;
-    const float jacksDx = 40;
+    const float jacksDx = 41;
     const float jacksX = 20;
 #ifdef _LAB
     const float labelX = jacksX - 20;
@@ -545,6 +575,16 @@ void SequencerWidget::addJacks(SequencerModule *module)
     addLabel(
         Vec(labelX + 1 + 2 * jacksDx, jacksY1 + dy),
         "Run");
+#endif
+
+    addInput(createInputCentered<PJ301MPort>(
+        Vec(jacksX + 3 * jacksDx, jacksY1),
+        module,
+        Comp::RELOAD_INPUT));
+#ifdef _LAB
+    addLabel(
+        Vec(-4 + labelX + 3 * jacksDx, jacksY1 + dy),
+        "Reload");
 #endif
 
     addOutput(createOutputCentered<PJ301MPort>(
@@ -586,6 +626,7 @@ void SequencerWidget::addJacks(SequencerModule *module)
         Vec(labelX + 2 * jacksDx, jacksY2 + dy),
         "EOC");
 #endif
+
 }
 
 void SequencerModule::dataFromJson(json_t *data)

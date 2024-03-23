@@ -140,7 +140,7 @@ void GMRWidget::loadGrammarFile() {
     std::string filename;
 
     // TODO: set a default?
-    // std::string dir = _module->sequencer->context->settings()->getMidiFilePath();
+    // std::string dir = _module->sequencer->context->settings()->();
 
     DEFER({
         osdialog_filters_free(filters);
@@ -387,7 +387,7 @@ void GMRWidget::loadGrammarFile() {
     std::string filename;
 
     // TODO: set a default?
-    // std::string dir = _module->sequencer->context->settings()->getMidiFilePath();
+    // std::string dir = _module->sequencer->context->settings()->();
 
     DEFER({
         osdialog_filters_free(filters);

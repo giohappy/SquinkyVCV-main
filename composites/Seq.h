@@ -69,6 +69,7 @@ public:
     enum InputIds {
         CLOCK_INPUT,
         RESET_INPUT,
+        RELOAD_INPUT,
         RUN_INPUT,
         GATE_INPUT,
         CV_INPUT,
